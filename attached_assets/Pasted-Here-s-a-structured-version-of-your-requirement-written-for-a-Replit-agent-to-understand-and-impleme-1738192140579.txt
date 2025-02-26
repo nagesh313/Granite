@@ -1,0 +1,49 @@
+Here’s a structured version of your requirement written for a Replit agent to understand and implement:
+
+Step-by-Step Block Processing Workflow
+
+1. Process Flow Control
+	•	A block must follow a sequential process:
+Cutting → Grinding → (Chemical Converter - Optional) → (Epoxy - Optional) → Polishing
+	•	Polishing is the final step; only after polishing is completed, the block is considered a finished product.
+	•	Chemical Converter and Epoxy can be skipped based on material type, but all other steps are mandatory.
+
+2. Block Visibility Logic for Job Creation
+	•	When creating a new job in any step, only blocks that have completed the previous step should be visible in the dropdown.
+	•	Example:
+	•	In Grinding Module: Only blocks that have completed Cutting should appear in the Block Number dropdown.
+	•	In Chemical Converter Module: Only blocks that have completed Grinding should appear in the Block Number dropdown.
+	•	In Epoxy Module: Only blocks that have completed Grinding (or Chemical Converter, if not skipped) should appear.
+	•	In Polishing Module: Only blocks that have completed Grinding (or Epoxy, if applicable) should appear.
+
+3. Skippable Steps Logic
+	•	If Chemical Converter is skipped: The block moves directly from Grinding → Epoxy (if applicable) → Polishing.
+	•	If Epoxy is skipped: The block moves directly from Grinding (or Chemical Converter) → Polishing.
+	•	Skipping is only allowed for Chemical Converter and Epoxy; all other steps must be completed in order.
+
+4. Status Tracking & Completion Rules
+	•	Each block should have a status field to track its progress:
+	•	Pending → Block is awaiting the current process step.
+	•	In Progress → Block is currently undergoing a step.
+	•	Completed → Block has successfully completed a step and is eligible for the next process.
+	•	The system should only allow job creation for a block in the next step if the previous step is marked as “Completed”.
+	•	Blocks should not be available in a module’s dropdown until their previous step is marked “Completed”.
+
+5. Agent Implementation Guidelines
+	•	Maintain a centralized block status database to track each block’s progress.
+	•	Filter the block dropdown dynamically based on each block’s status:
+	•	Query the database to show only blocks that have Completed status in the required previous step.
+	•	Validate job creation requests to prevent skipping required steps.
+	•	Allow skipping of Chemical Converter and Epoxy, but ensure Polishing is the final required step.
+	•	Once Polishing is complete, update the block’s status as “Finished Product”, making it unavailable for further processing.
+
+Expected Behavior in Replit Agent
+	1.	When a user creates a Cutting job → All raw blocks should be available.
+	2.	When a user creates a Grinding job → Only blocks that have Completed Cutting should be available.
+	3.	When a user creates a Chemical Converter or Epoxy job:
+	•	If a block’s material requires Chemical Converter, it must be completed before appearing in Epoxy.
+	•	If a block’s material skips Chemical Converter, it should go directly to Epoxy (if applicable) or Polishing.
+	4.	When a user creates a Polishing job → Only blocks that have Completed Grinding or the optional steps should be available.
+	5.	After Polishing is marked “Completed”, update the block’s status as “Finished Product”, and remove it from all processing dropdowns.
+
+This structured logic will ensure that blocks progress step by step without skipping mandatory steps, while also allowing flexibility for optional processes. Let me know if you need refinements! 🚀

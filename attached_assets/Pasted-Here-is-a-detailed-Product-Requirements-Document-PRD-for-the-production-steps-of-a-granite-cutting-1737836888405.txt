@@ -1,0 +1,125 @@
+Here is a detailed Product Requirements Document (PRD) for the production steps of a granite cutting and processing manufacturing unit:
+
+Product Requirements Document (PRD)
+
+Granite Cutting and Processing Application
+
+Version: 1.0
+Owner: [Your Name/Team]
+Date: [Insert Date]
+
+Objective
+
+Develop a digital platform to streamline and automate the production processes at a granite cutting and processing unit. This includes managing raw materials, cutting, grinding, polishing, and inventory operations with real-time data capture and reporting.
+
+Scope
+
+The platform will focus on the following production steps:
+	1.	Raw Material Management
+	2.	Cutting (Production Start)
+	3.	Grinding
+	4.	Chemical and Epoxy Processes (Conditional)
+	5.	Polishing
+	6.	Finished Goods Management
+
+Functional Requirements
+
+1. Raw Material Management
+	•	Order Placement: Allow users to input details of raw materials ordered, including supplier and estimated delivery date.
+	•	Inventory Check-In:
+	•	Capture the following details for each raw material block:
+	•	Unique Block Number
+	•	Dimensions (Length, Width, Height)
+	•	Net Weight and Individual Block Weight (auto-calculated using dimensions and density)
+	•	Size, Color Quality, and Marka (company ownership)
+	•	Mine’s Name and Vehicle Number
+	•	Type of Block (Single, Double, or Triple with suffix A/B/C)
+	•	Photos (both sides) and Comments
+	•	Automated Inventory Updates:
+	•	System updates stock when blocks are checked into the storage area (Gantry).
+
+2. Cutting (Production Start)
+	•	Loading:
+	•	Track Block Number, Machine Number, and Trolley Number (total 2 trolleys).
+	•	Blade and Segment Management:
+	•	Blade Life (Approx 2L sqft per blade).
+	•	Segment Life (Approx 30k sqft per segment).
+	•	Brazing records (segments added to blades).
+	•	Cutting Process Tracking:
+	•	Record start and end time, machine logs (Job Card).
+	•	Machine stop logs, including reasons:
+	•	Power outage
+	•	Maintenance
+	•	Segment Height (mm) and measurement of all 14 blade segments.
+	•	Output Capture:
+	•	Total slabs produced after cutting.
+	•	Post-cutting photos of slabs.
+	•	System Automation:
+	•	Auto-generate machine logs and job cards for each process.
+
+3. Grinding
+	•	Line Polishing Machine Tracking (Night Shift):
+	•	Block vs. Pieces Mapping.
+	•	Record start and end time, including reasons for machine stoppages:
+	•	No Light
+	•	Maintenance
+	•	Output Calculation:
+	•	Total pieces processed in 12 hours (approx. 300 slabs).
+	•	Record defects and irregularities.
+	•	Abrasive Life Management:
+	•	Track and manage abrasive life (TBD values).
+	•	Output Capture:
+	•	Photos of regular and defective slabs.
+
+4. Chemical Converter and Epoxy Application
+	•	Conditional Execution:
+	•	Skipped for ‘direct polish’ material slabs.
+	•	Manual Process Management:
+	•	Logs of manual application (if required).
+
+5. Polishing
+	•	Line Polish Machine Tracking (Day Shift):
+	•	Block vs. Pieces Mapping.
+	•	Record start and end time, including stoppage reasons:
+	•	No Light
+	•	Maintenance
+	•	Output Calculation:
+	•	Total pieces processed in 12 hours (approx. 300 slabs).
+	•	Record defects and irregularities.
+	•	Abrasive Life Management:
+	•	Track and manage abrasive life (TBD values).
+	•	Output Capture:
+	•	Photos of regular and defective slabs.
+
+6. Finished Goods Management
+	•	Inventory Update:
+	•	Move finished slabs into inventory.
+	•	Stock shade management (52 stands available).
+	•	Output Capture:
+	•	Photos of finished slabs for documentation.
+
+Non-Functional Requirements
+	•	Usability:
+	•	Intuitive user interface for manual and automated data entry.
+	•	Scalability:
+	•	Support for expanding inventory, production, and storage needs.
+	•	Data Security:
+	•	Secure storage of production data and photos.
+	•	System Integration:
+	•	Ability to integrate with existing ERP or inventory management systems.
+	•	Reporting and Analytics:
+	•	Generate reports for production efficiency, downtime, and inventory usage.
+
+Success Metrics
+	•	Reduction in manual errors during production tracking.
+	•	Enhanced visibility into inventory and production status.
+	•	Real-time tracking of blade, segment, and abrasive life.
+	•	Improved reporting accuracy for downtime and machine performance.
+
+Deliverables
+	•	Fully functional web or mobile application.
+	•	Dashboard for production and inventory insights.
+	•	Automated job card generation for all production stages.
+	•	Integration with photo capture systems.
+
+Feel free to customize or add additional features based on specific requirements.

@@ -1,0 +1,57 @@
+The issue with saving new image names in the raw materials is likely related to how the image name updates and validation are handled in the BlockForm component in block-form.tsx. Currently, the image name validation may not be correctly set to accommodate new names within the current block form context.
+
+Here's what you should do:
+Update the handleImageNameChange function: Ensure that it updates the names correctly and maintains the state of currently used names as you did in previous fixes.
+
+Add additional checks within the validatePhotoNames function: Ensure it checks for name uniqueness only within the block form.
+
+Here’s an updated code snippet for the relevant sections in block-form.tsx:
+
+const handleImageNameChange = (e: React.ChangeEvent<HTMLInputElement>, side: 'front' | 'back') => {
+    const newName = e.target.value;
+    const fieldName = side === 'front' ? 'frontPhoto' : 'backPhoto';
+    const currentValue = form.getValues(fieldName);
+    
+    form.setValue(fieldName, {
+      ...currentValue,
+      name: newName
+    }, { shouldValidate: true, shouldDirty: true });
+    // Update the usedImageNames set
+    setUsedImageNames(prev => {
+      const updated = new Set(prev);
+      if (currentValue.name) {
+        updated.delete(currentValue.name);
+      }
+      updated.add(newName);
+      return updated;
+    });
+};
+const validatePhotoNames = (values: z.infer<typeof formSchema>): boolean => {
+    const frontPhotoName = values.frontPhoto.name.trim();
+    const backPhotoName = values.backPhoto.name.trim();
+    // Check if names are empty
+    if (!frontPhotoName || !backPhotoName) {
+      toast({
+        title: "Error",
+        description: "Please provide names for both front and back photos",
+        variant: "destructive"
+      });
+      return false;
+    }
+    // Check if front and back photos have the same name within this form
+    if (frontPhotoName === backPhotoName) {
+      toast({
+        title: "Error",
+        description: "Front and back photo names must be different within the same block",
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
+};
+Key Changes Made:
+Validation Adjustments: Ensure photo names are validated only within the form to allow unique names across different blocks without conflicts.
+
+Improved Name Handling: Updated the handleImageNameChange function to set the shouldValidate and shouldDirty flags to properly track changes and maintain the correct state with the used names.
+
+With these changes, you should be able to save new image names without encountering errors related to global naming conflicts.

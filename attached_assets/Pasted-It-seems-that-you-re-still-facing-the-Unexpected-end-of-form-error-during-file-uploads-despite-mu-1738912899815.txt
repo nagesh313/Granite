@@ -1,0 +1,73 @@
+It seems that you're still facing the "Unexpected end of form" error during file uploads, despite multiple attempts to resolve it. Let's take a closer look at some possible causes and additional steps to troubleshoot this issue.
+
+Possible Causes and Solutions
+Client-Side Restrictions:
+
+Ensure that the client-side file selection and form submission code is correctly configured. Verify that you are indeed selecting files within the allowed size and type constraints.
+Check the Size of Uploads:
+
+While you have set a limit for file sizes in your Express app using multer, verify that the individual files selected on the client do not exceed this limit. The max file size in your code is set at 50MB, but if you mistakenly select larger files on the client side, it will cause issues.
+Network Issues:
+
+Sometimes, network or connectivity issues can lead to incomplete uploads, which may trigger this error. Ensure you have a stable internet connection during uploads.
+Debugging Logs:
+
+Add more console logs on both the client and server to capture what's happening. For instance:
+Client Side (GalleryDialog.tsx):
+
+const uploadMutation = useMutation({
+  mutationFn: async (files: File[]) => {
+    console.log('Uploading files: ', files.map(f => f.name));
+    // existing code...
+  },
+  // existing code...
+});
+Server Side (finished-goods.ts):
+
+router.post("/:id/media", async (req, res) => {
+  console.log('Request received with files: ', req.files);
+  // existing code...
+});
+File Upload Route:
+
+Using a middleware approach can help streamline how multer processes the incoming requests. Here’s an updated snippet based on your previous code for better clarity:
+// Add media to a finished good
+router.post("/:id/media", (req, res) => {
+  const uploadMiddleware = upload.array('files', 10);
+  uploadMiddleware(req, res, async (err) => {
+    if (err) {
+      console.error('Upload error:', err);
+      return res.status(400).json({ error: err.message });
+    }
+    const files = req.files as Express.Multer.File[];
+    if (!files || files.length === 0) {
+      return res.status(400).json({ error: 'No files uploaded' });
+    }
+    console.log('Files successfully uploaded: ', files);
+    // Proceed with your business logic to save files and respond
+  });
+});
+Client Form Submission:
+
+Ensure that you're correctly creating the FormData object and appending files properly before sending the POST request. Here’s a quick review of how you manage file uploads in the handleUpload function:
+const handleUpload = async () => {
+  if (selectedFiles.length === 0) {
+    console.error("No files selected for upload");
+    return;
+  }
+  const formData = new FormData();
+  selectedFiles.forEach(({ file }) => formData.append('files', file));
+  try {
+    console.log("FormData entries before sending:", [...formData.entries()]);
+    await uploadMutation.mutateAsync(selectedFiles.map(f => f.file));
+  } catch (error) {
+    console.error("Error during upload:", error);
+  }
+};
+Summary
+Ensure client-side validation doesn’t allow oversized files.
+Add detailed logging on both server-side and client-side to analyze the flow.
+Inspect your internet connection to avoid transient issues during upload.
+Confirm that the files are being appended and sent correctly in your form submission.
+Try these suggestions, and if the issue persists, additional debugging logs from both the client and server will be helpful to narrow down the problem. Let me know how it goes!
+

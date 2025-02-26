@@ -1,0 +1,81 @@
+It looks like there might be several reasons why you cannot upload images or videos in the gallery. Here's what to check and a possible solution based on the code snippets you provided:
+
+Possible Issues:
+File size limit: Ensure that the files you're trying to upload do not exceed the 50MB limit specified in the server-side code.
+Invalid file types: Make sure you are uploading files of types that are allowed (jpeg, jpg, png, gif, mp4, webm, ogg). Files of other types will be rejected.
+Error Handling: According to the console logs, there's an error indicating "Unexpected end of form" during upload. This suggests that the upload might be failing either due to the upload process not completing or networking issues.
+Suggestions:
+Check client-side handling: Ensure the handleFileChange function in the GalleryDialog correctly processes file uploads.
+Check Server configuration: Verify that the server is properly set up to handle multi-part uploads using multer.
+Complete Code to Review:
+Here’s the relevant part of your upload handling code from the GalleryDialog and server-side logic:
+
+Client-Side: GalleryDialog.tsx
+Make sure the file handling logic looks correct, particularly the part that triggers the file input.
+
+const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const files = e.target.files;
+  if (!files?.length) return;
+  setIsUploading(true);
+  const formData = new FormData();
+  try {
+    let validFiles = 0;
+    const maxSize = 50 * 1024 * 1024; // 50MB limit
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.size > maxSize) {
+        toast({
+          title: "File too large",
+          description: `${file.name} exceeds 50MB limit`,
+          variant: "destructive"
+        });
+        continue;
+      }
+      if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+        formData.append('files', file);
+        validFiles++;
+      }
+    }
+    if (validFiles === 0) {
+      toast({
+        title: "Invalid files",
+        description: "Please select image or video files only",
+        variant: "destructive"
+      });
+      setIsUploading(false);
+      return;
+    }
+    await uploadMutation.mutateAsync(formData);
+    e.target.value = '';
+  } catch (error) {
+    console.error('Upload error:', error);
+    toast({
+      title: "Upload failed",
+      description: error instanceof Error ? error.message : "Failed to upload media",
+      variant: "destructive"
+    });
+  } finally {
+    setIsUploading(false);
+  }
+};
+Server-Side: finished-goods.ts
+Ensure that the server-side code properly saves the uploaded files. The multer configuration and the route that handles uploads look correct based on your setup.
+
+// Add media to a finished good
+router.post("/:id/media", (req, res) => {
+  upload(req, res, async (err) => {
+    if (err instanceof multer.MulterError) {
+      console.error("Multer error:", err);
+      return res.status(400).json({ error: err.message });
+    } else if (err) {
+      console.error("Upload error:", err);
+      return res.status(500).json({ error: err.message });
+    }
+    // Handle successful file upload...
+  });
+});
+Debugging Steps:
+Console Logs: Add console.log statements in both client-side and server-side code to trace where it might be failing.
+Check Network: Use the browser's developer tools to see if the request is sent correctly and whether the server responds properly.
+Test with Small Files: Try uploading a small valid file to confirm that the upload mechanism is working before testing with larger files.
+These checkpoints should help identify where the issue might be occurring and ensure that files can be uploaded successfully.

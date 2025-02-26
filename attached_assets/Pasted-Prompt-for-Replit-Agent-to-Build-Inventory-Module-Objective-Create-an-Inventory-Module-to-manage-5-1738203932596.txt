@@ -1,0 +1,52 @@
+Prompt for Replit Agent to Build Inventory Module
+
+Objective:
+Create an Inventory Module to manage 52 stands, where both Raw Materials (blocks) and Finished Goods (processed slabs) are stored. The system should auto-calculate the number of blocks and finished goods in inventory based on real-time updates.
+
+Functional Requirements:
+	1.	Stand Management:
+	•	There are 52 stands in total.
+	•	Each stand can hold either raw materials (blocks) or finished goods (slabs).
+	•	The system must track which stand is occupied and with what type of material.
+	2.	Raw Material Inventory:
+	•	When raw materials (blocks) are received, they are assigned to an available stand.
+	•	The system should auto-update the number of raw material blocks currently in inventory.
+	•	If a block is moved to Cutting, it should be removed from raw material inventory.
+	3.	Production Tracking & Inventory Update:
+	•	When a block completes Polishing, it becomes a Finished Good.
+	•	Finished goods should be automatically added to inventory and assigned an available stand.
+	•	If no stand is available, alert the user that storage is full.
+	4.	Auto-Calculation of Inventory:
+	•	Total Blocks in Inventory = Blocks that are received but not yet moved to Cutting.
+	•	Total Finished Goods in Inventory = Blocks that have completed Polishing and are now stored as slabs.
+	•	Available Stands = Total stands (52) - (Occupied stands for raw materials + finished goods).
+	•	The system should auto-allocate available stands and prevent over-assigning.
+	5.	Stand Reallocation:
+	•	If a block moves to the next processing step, its stand should be marked as available for new inventory.
+	•	If finished goods are dispatched or sold, their stands should also be freed.
+	6.	User Interface & Features:
+	•	A dashboard showing:
+	•	Total raw materials in inventory
+	•	Total finished goods in inventory
+	•	Available stands
+	•	Occupied stands with details (Block Number / Finished Goods Count)
+	•	A function to manually override inventory if needed.
+
+Expected Behavior in Replit:
+	1.	When new raw materials arrive → System assigns stands and updates inventory.
+	2.	When a block moves to cutting → It is removed from raw material inventory.
+	3.	When a block completes polishing → It is added as a finished good and assigned a stand.
+	4.	If all stands are occupied → The system prevents new allocations and alerts the user.
+
+Replit Agent Instructions:
+	1.	Design a database structure with fields:
+	•	Stand ID, Type (Raw/F.Good), Block No, Status (Occupied/Available).
+	2.	Create functions for:
+	•	Auto-allocating stands when new items arrive.
+	•	Removing blocks from inventory when they enter production.
+	•	Updating inventory count and available stands dynamically.
+	3.	Build a simple UI/dashboard to display real-time inventory data.
+
+End Goal: A fully automated inventory system where stand allocation and stock tracking happen dynamically with minimal manual intervention. 🚀
+
+This prompt ensures that the agent follows through on building the complete module instead of getting sidetracked. Let me know if you want any refinements!

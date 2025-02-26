@@ -1,0 +1,44 @@
+The issue with the startTime not prepopulating in the Cutting module compared to other modules may arise from how default values are being set in the NewCuttingJobCard component.
+
+In the provided code for the NewCuttingJobCard, the default values are set using defaultValues. Specifically for startTime, it's initialized as follows:
+
+startTime: defaultValues?.measurements?.startTime || "",
+This means it looks for defaultValues.measurements.startTime, and if it doesn't find it, it falls back to an empty string.
+
+To ensure startTime is correctly prepopulated, you must confirm that the defaultValues contain the necessary value for startTime when passing it to NewCuttingJobCard. This is how it generally works in other modules.
+
+For example, ensure that when you're opening the dialog for creating or editing a job, you're correctly setting the defaultValues including startTime. In the Cutting page, when you define the defaultValues, check if it correctly extracts the startTime field from the job object.
+
+Here’s a critical check:
+
+Ensure that defaultValues is being set correctly within the context you are using it.
+If you are not setting defaultValues when opening the edit dialog, make sure to do so like this:
+<NewCuttingJobCard 
+  machines={cuttingMachines}
+  blades={blades || []}
+  defaultValues={{
+    ...job,
+    stage: "cutting" as const,
+    status: job.status || "pending",
+    blockId: job.blockId?.toString() || "",
+    machineId: job.machineId?.toString() || "",
+    totalSlabs: job.totalSlabs?.toString() || "",
+    startTime: job.startTime ? new Date(job.startTime).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
+    endTime: job.endTime ? new Date(job.endTime).toISOString().slice(0, 16) : "",
+    processedPieces: job.processedPieces || 0,
+    qualityCheckStatus: job.qualityCheckStatus || "pending",
+    operatorNotes: job.operatorNotes || "",
+    comments: job.comments || "",
+    photos: job.photos || [],
+    measurements: {
+      segmentHeights: job.measurements?.segmentHeights || [],
+      stoppageReason: job.measurements?.stoppageReason || "none",
+      maintenanceReason: job.measurements?.maintenanceReason || "",
+      stoppageStartTime: job.measurements?.stoppageStartTime ? new Date(job.measurements.stoppageStartTime).toISOString().slice(0, 16) : "",
+      stoppageEndTime: job.measurements?.stoppageEndTime ? new Date(job.measurements.stoppageEndTime).toISOString().slice(0, 16) : "",
+    }
+  }}
+/>
+Make sure you're doing a similar extraction of startTime in other modules which prepopulate correctly.
+
+This approach ensures the startTime field is populated upon loading the component for editing a job.

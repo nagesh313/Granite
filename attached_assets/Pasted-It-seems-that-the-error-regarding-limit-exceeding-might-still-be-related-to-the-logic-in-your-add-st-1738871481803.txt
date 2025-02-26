@@ -1,0 +1,43 @@
+It seems that the error regarding limit exceeding might still be related to the logic in your add stock function or how the data is being fetched/processed. Let’s ensure the check for adding stocks is accurate.
+
+The invalid message may indicate that the API is not recognizing the current stock levels correctly. Here’s how to debug and fix it:
+
+Log Values on Submission: Make sure you are correctly logging the total values before the submission, which will help clarify if the calculations are right.
+In your AddStockDialog.tsx, update the onSubmit function as follows to log the necessary values:
+
+function onSubmit(values: z.infer<typeof formSchema>) {
+    const selectedStandData = stands.find(s => s.id === values.standId);
+    if (!selectedStandData) return;
+    const newTotal = selectedStandData.currentSlabs + values.slabCount;
+    // Log the current values
+    console.log('Current Slabs:', selectedStandData.currentSlabs);
+    console.log('Slab Count Being Added:', values.slabCount);
+    console.log('New Total Slabs:', newTotal);
+    console.log('Max Capacity for Stand:', selectedStandData.maxCapacity);
+    if (newTotal > selectedStandData.maxCapacity) {
+        toast({
+            title: "Error",
+            description: `Total would exceed maximum capacity of ${selectedStandData.maxCapacity}. Current: ${selectedStandData.currentSlabs}, Attempting to add: ${values.slabCount}`,
+            variant: "destructive",
+        });
+        return;
+    }
+    addStockMutation.mutate(values);
+}
+Check the Server Logic: In your server's finished-goods.ts, double-check how you are fetching the current slab count:
+// Check if adding new slabs would exceed maximum capacity
+if (newTotal > 200) {
+    return res.status(400).json({ 
+        error: `Cannot exceed maximum capacity of 200. Current: ${currentSlabCount}, Attempting to add: ${slabCount}` 
+    });
+}
+Ensure that the currentSlabCount fetched from the database reflects the actual number of slabs currently held. If the logic for fetching it is incorrect, it might lead to inaccurate counts.
+
+Database Check: Ensure that the current slab counts in the finished_goods table match your expectations and align with your checks. You can do this by running:
+SELECT standId, SUM(slabCount) as TotalSlabs 
+FROM finished_goods 
+GROUP BY standId;
+Run these checks to see if your data in the database aligns with your expected calculations.
+
+Inspecting MongoDB: Check if there are any entries in the finished_goods table that shouldn’t be there or are outdated.
+After making these adjustments and checks, try to add the stock again and observe the logs for insights. If you continue experiencing issues, share the logs or any error messages so we can assist you further.

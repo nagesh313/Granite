@@ -1,0 +1,70 @@
+To resolve the "Unexpected end of form" error while adding new images or videos in the gallery dialog, you may need to check the file upload handling in your finished-goods.ts route. The issue often arises from validation checks or handling of the multipart form data.
+
+Here's a complete updated version of your existing file upload handling in server/routes/finished-goods.ts. Make sure that you have the proper checks to validate the file upload correctly:
+
+// Add media to a finished good
+router.post("/:id/media", (req, res) => {
+  const uploadMiddleware = upload.array('files');
+  uploadMiddleware(req, res, async (err) => {
+    const uploadedFiles: Express.Multer.File[] = [];
+    try {
+      if (err) {
+        console.error('Upload error:', err);
+        throw new Error(err instanceof multer.MulterError ? 
+          `Upload error: ${err.message}` : 
+          `File validation error: ${err.message}`
+        );
+      }
+      const files = req.files as Express.Multer.File[];
+      if (!files || !Array.isArray(files) || files.length === 0) {
+        throw new Error('No files uploaded');
+      }
+      uploadedFiles.push(...files);
+      // Get existing media
+      const [item] = await db
+        .select({ media: finishedGoods.media })
+        .from(finishedGoods)
+        .where(eq(finishedGoods.id, parseInt(req.params.id)));
+      if (!item) {
+        throw new Error('Finished good not found');
+      }
+      const fileNames = uploadedFiles.map(file => file.filename);
+      const updatedMedia = [...(item.media || []), ...fileNames];
+      // Update database
+      await db
+        .update(finishedGoods)
+        .set({ 
+          media: updatedMedia,
+          updated_at: new Date()
+        })
+        .where(eq(finishedGoods.id, parseInt(req.params.id)));
+      res.json({ 
+        files: fileNames.map(filename => ({
+          name: filename,
+          url: `/api/finished-goods/media/${filename}`
+        }))
+      });
+    } catch (error) {
+      console.error("Error handling upload:", error);
+      // Cleanup uploaded files on error
+      uploadedFiles.forEach(file => {
+        try {
+          fs.unlinkSync(file.path);
+        } catch (unlinkError) {
+          console.error("Failed to cleanup file:", file.path, unlinkError);
+        }
+      });
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to upload files",
+        details: error instanceof Error ? error.stack : String(error)
+      });
+    }
+  });
+});
+Key Changes:
+Error Handling: The code captures errors more informatively, helping to understand what's failing during uploads.
+Validation: Ensure proper file handling and checks for uploaded files.
+After Updating:
+Once you've made these changes, try running your application again and uploading the media through the gallery. If issues persist, ensure the file types and sizes meet the configuration set in Multer. The file size limit should be consistent between your form and the backend settings (50 MB in your configuration).
+
+Let me know if you need any further assistance!

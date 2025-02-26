@@ -1,0 +1,104 @@
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+html {
+  font-size: 16px;
+}
+
+/* Web-specific responsive breakpoints */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 12px;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .animate-gradient {
+    animation: gradient 8s ease infinite;
+    background-size: 200% 200%;
+    background-position: 0% 0%;
+  }
+
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      @apply bg-transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      @apply rounded-full bg-muted hover:bg-muted-foreground/30 transition-colors;
+    }
+
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* Web-specific layout classes */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  contain: layout;
+  overflow-x: hidden;
+}
+
+.module-container {
+  max-width: calc(100vw - 16rem);
+  min-width: 0;
+  margin-left: 16rem;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* Web responsive breakpoints */
+@media (max-width: 1024px) {
+  .module-container {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .module-container {
+    max-width: 100vw;
+    margin-left: 0;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .module-container {
+    padding: 0.75rem;
+  }
+}

@@ -1,0 +1,43 @@
+The block number not prepopulating in the grinding and cutting job edit dialogs usually indicates issues with fetching block data or setting the form values properly.
+
+To ensure the block number is prepopulated correctly, you need to verify that the defaultValues are being correctly passed and utilized in the job cards. Here are the adjustments you can make to the respective components:
+
+Edit Job Card Component - Ensure you're setting the form value correctly with block data fetching.
+// client/src/components/production/edit-job-card.tsx
+const { data: blockData } = useQuery({
+  queryKey: [`/api/blocks/${job.blockId}`],
+  queryFn: async () => {
+    const response = await fetch(`/api/blocks/${job.blockId}`);
+    if (!response.ok) throw new Error('Failed to fetch block');
+    return response.json();
+  },
+  enabled: !!job.blockId,
+});
+useEffect(() => {
+  if (job.blockId && blockData) {
+    const displayValue = `${blockData.blockNumber} - ${blockData.blockType}${blockData.marka ? ` - ${blockData.marka}` : ''}`;
+    setSearchQuery(displayValue);
+    form.setValue("blockId", job.blockId);  // Ensure the blockId is set
+  }
+}, [job.blockId, blockData, form]);
+Cutting Job Card Component - Verify the effect for setting the search query when loading default values.
+// client/src/components/production/cutting/new-job-card.tsx
+useEffect(() => {
+  const selectedBlock = blocks.find(b => b.id === defaultValues.blockId);
+  if (selectedBlock) {
+    const displayValue = `${selectedBlock.blockNumber} - ${selectedBlock.blockType}${selectedBlock.marka ? ` - ${selectedBlock.marka}` : ''}`;
+    setSearchQuery(displayValue);
+    form.setValue("blockId", defaultValues.blockId, { shouldValidate: true }); // Ensure form value is set
+  }
+}, [defaultValues?.blockId, blocks, form]);
+Grinding Job Card Component - Check if the block data is being set properly.
+// client/src/components/production/grinding/new-job-card.tsx
+useEffect(() => {
+  const selectedBlock = blocks.find(b => b.id === defaultValues.blockId);
+  if (selectedBlock) {
+    const displayValue = `${selectedBlock.blockNumber} - ${selectedBlock.blockType}${selectedBlock.marka ? ` - ${selectedBlock.marka}` : ''}`;
+    setSearchQuery(displayValue);
+    form.setValue("blockId", defaultValues.blockId, { shouldValidate: true }); // Ensure form value is set
+  }
+}, [defaultValues?.blockId, blocks, form]);
+With these adjustments, ensure that the blockId is passed correctly in the defaultValues and that data fetching is successful. This should resolve the issue with block numbers not prepopulating when editing jobs in both the grinding and cutting dialogs. If the problem persists, check the API response in the network tab to verify that the block data is being fetched as expected.

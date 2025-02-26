@@ -1,0 +1,1 @@
+// This file is intentionally left empty as the inventory management system has been removed.

@@ -1,0 +1,113 @@
+Here are the possible reasons for the issues you're experiencing when adding or editing a block in the Raw Materials management system:
+
+Image Preview is Blank:
+
+Corrupted Images: The uploaded images may not be properly saved or have become corrupt during the upload process. Ensure that files are correctly handled and validated before uploading.
+Incorrect File URL: Check if the file's URL is being correctly constructed or passed to the UI. If it fails to point to a valid image, the preview will be blank.
+Image Name Not Saving:
+
+Form Submission Handling: Ensure that the image name is properly included in the form data when submitting. If it’s not being captured in the handleSubmit function or is missing in the payload, it won't save.
+Server Handling: Verify that the server-side logic is handling the image name correctly, ensuring it’s saved to the database when a block is created or updated.
+Weight Field Not Saving:
+
+Form Schema Definitions: Ensure that the weight input is correctly defined in the form schema and that it is bound to the state correctly.
+Database Schema Update: Check if the database schema has been updated to include the weight field. If not, ensure that the schema reflects any changes to include weight.
+Handling Submission Logic: Verify that the handleSubmit function captures the weight value correctly and that it is being passed to the server.
+Proposed Code Changes
+Here are recommended changes to address these issues:
+
+Ensure Image URLs are Managed Properly:
+
+Update the handle photo upload logic to ensure the photo's URL is being set and validated correctly:
+
+const handlePhotoUpload = async (file: File, side: 'front' | 'back'): Promise<string> => {
+    try {
+        const reader = new FileReader();
+        return new Promise<string>((resolve, reject) => {
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                if (base64String) {
+                    resolve(base64String);
+                } else {
+                    reject(new Error('Failed to load image'));
+                }
+            };
+            reader.onerror = () => {
+                reject(new Error('Failed to read file'));
+            };
+            reader.readAsDataURL(file);
+        });
+    } catch (error) {
+        console.error('Photo upload error:', error);
+        toast({
+            title: "Error",
+            description: "Failed to process photo. Please try again.",
+            variant: "destructive",
+        });
+        throw error;
+    }
+};
+Capture Image Names Properly:
+
+Ensure photoFrontName and photoBackName are captured in the form:
+
+const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+        const frontPhotoUrl = await onPhotoUpload(values.frontPhoto.file, 'front');
+        const backPhotoUrl = await onPhotoUpload(values.backPhoto.file, 'back');
+        const formData = {
+            ...values,
+            frontPhoto: {
+                url: frontPhotoUrl,
+                name: values.frontPhoto.name || `front_${values.blockNumber}`
+            },
+            backPhoto: {
+                url: backPhotoUrl,
+                name: values.backPhoto.name || `back_${values.blockNumber}`
+            },
+        };
+        // API Call to save formData
+    } catch (error) {
+        toast({
+            title: "Error",
+            description: "Failed to save data.",
+            variant: "destructive",
+        });
+    }
+};
+Manage Weight Handling:
+
+Ensure that weight is properly captured and sent in the submission:
+
+const formSchema = z.object({
+    weight: z.number().optional(),
+    // other fields...
+});
+const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    const formData = {
+        ...values,
+        weight: Number(values.weight) || 0,
+        // Ensure all other relevant data is included
+    };
+    // API Call to save formData
+};
+Check Server Routes:
+
+Make sure the server code handling the route for blocks includes the weight and the photo names:
+
+app.post('/api/blocks', async (req, res) => {
+    try {
+        const { weight, photoFront, photoBack } = req.body;
+        // Other parameters...
+        await db.insert(blocks).values({
+            weight,
+            photoFrontName: photoFront.name,
+            photoBackName: photoBack.name,
+            // Other parameters...
+        });
+        res.status(201).send("Block created");
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+By adjusting the code as suggested above and ensuring that all components—including server handling, schema updates, and form logic—work cohesively, these issues should be resolved.
